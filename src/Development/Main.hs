@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell   #-}
-module Development.ParserHelper (main) where
+module Main (main) where
 
 import           Data.Aeson
 import           Data.Aeson.TH
