@@ -9,6 +9,10 @@ import           Data.Text                       (pack)
 import           Language.Haskell.Exts.Annotated
 import           System.Environment
 
+-- | Program version. Important for API changes.
+version :: String
+version = "0.1.0"
+
 $(deriveToJSON defaultOptions { sumEncoding = ObjectWithSingleField } ''SrcSpanInfo)
 $(deriveToJSON defaultOptions { sumEncoding = ObjectWithSingleField } ''SrcSpan)
 $(deriveToJSON defaultOptions { sumEncoding = ObjectWithSingleField } ''Module)
@@ -164,7 +168,19 @@ instance ToJSON l => ToJSON (Rule l) where
 -- | Parse the first argument and serialize as JSON to stdout.
 main :: IO ()
 main = do
-    (fileName:_) <- getArgs
+    (arg:_) <- getArgs
+    if arg == "--numeric-version" || arg == "--version"
+        then printVersion arg
+        else doWork arg
+
+-- | Print the version.
+printVersion :: String -> IO ()
+printVersion "--numeric-version" = putStrLn version
+printVersion "--version"         = putStrLn $ "parser-helper v" ++ version
+
+-- | Parse, serialize and print to stdout.
+doWork :: String -> IO ()
+doWork fileName = do
     let parseOpts = defaultParseMode { parseFilename = "A.hs"
                                      , baseLanguage = Haskell2010
                                      }
