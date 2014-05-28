@@ -5,9 +5,11 @@ module Main (main) where
 import           Data.Aeson
 import           Data.Aeson.TH
 import qualified Data.ByteString.Lazy            as B
+import           Data.Maybe                      (listToMaybe)
 import           Data.Text                       (pack)
 import           Language.Haskell.Exts.Annotated
 import           System.Environment
+import           System.Exit                     (exitFailure)
 
 -- | Program version. Important for API changes.
 version :: String
@@ -168,15 +170,21 @@ instance ToJSON l => ToJSON (Rule l) where
 -- | Parse the first argument and serialize as JSON to stdout.
 main :: IO ()
 main = do
-    (arg:_) <- getArgs
-    if arg == "--numeric-version" || arg == "--version"
-        then printVersion arg
-        else doWork arg
+    maybeArg <- getArgs >>= return . listToMaybe
+    case maybeArg of
+        Just arg -> handleArg arg
+        Nothing -> printUsage >> exitFailure
 
--- | Print the version.
-printVersion :: String -> IO ()
-printVersion "--numeric-version" = putStrLn version
-printVersion "--version"         = putStrLn $ "parser-helper v" ++ version
+-- | Handle possible arguments.
+handleArg "--numeric-version" = putStrLn version
+handleArg "--version"         = putStrLn $ "parser-helper v" ++ version
+handleArg "--help"            = printUsage
+handleArg "-h"                = printUsage
+handleArg fileName            = doWork fileName
+
+-- | Print usage info.
+printUsage :: IO ()
+printUsage = putStrLn "Usage: parser-helper [ file | --numeric-version | --version ]"
 
 -- | Parse, serialize and print to stdout.
 doWork :: String -> IO ()
