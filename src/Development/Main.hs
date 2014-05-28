@@ -170,8 +170,8 @@ instance ToJSON l => ToJSON (Rule l) where
 -- | Parse the first argument and serialize as JSON to stdout.
 main :: IO ()
 main = do
-    maybeArg <- getArgs >>= return . listToMaybe
-    case maybeArg of
+    args <- getArgs
+    case listToMaybe args of
         Just arg -> handleArg arg
         Nothing -> printUsage >> exitFailure
 
