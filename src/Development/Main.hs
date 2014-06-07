@@ -13,7 +13,7 @@ import           System.Exit                     (exitFailure)
 
 -- | Program version. Important for API changes.
 version :: String
-version = "0.1.0"
+version = "0.1.0.1"
 
 $(deriveToJSON defaultOptions { sumEncoding = ObjectWithSingleField } ''SrcSpanInfo)
 $(deriveToJSON defaultOptions { sumEncoding = ObjectWithSingleField } ''SrcSpan)
@@ -191,6 +191,7 @@ doWork :: String -> IO ()
 doWork fileName = do
     let parseOpts = defaultParseMode { parseFilename = "A.hs"
                                      , baseLanguage = Haskell2010
+                                     , extensions = ghcDefault
                                      }
     p <- parseFileWithComments parseOpts fileName
     case p of
