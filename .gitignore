@@ -1,0 +1,4 @@
+.cabal-sandbox/
+.idea/copyright/
+cabal.sandbox.config
+dist/

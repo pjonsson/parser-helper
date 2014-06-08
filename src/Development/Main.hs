@@ -5,6 +5,7 @@ module Main (main) where
 import           Data.Aeson
 import           Data.Aeson.TH
 import qualified Data.ByteString.Lazy            as B
+import           Data.List                       (isPrefixOf)
 import           Data.Maybe                      (listToMaybe)
 import           Data.Text                       (pack)
 import           Language.Haskell.Exts.Annotated
@@ -169,29 +170,30 @@ instance ToJSON l => ToJSON (Rule l) where
 
 -- | Parse the first argument and serialize as JSON to stdout.
 main :: IO ()
-main = do
-    args <- getArgs
-    case listToMaybe args of
-        Just arg -> handleArg arg
-        Nothing -> printUsage >> exitFailure
+main = getArgs >>= handleArgs
 
 -- | Handle possible arguments.
-handleArg "--numeric-version" = putStrLn version
-handleArg "--version"         = putStrLn $ "parser-helper v" ++ version
-handleArg "--help"            = printUsage
-handleArg "-h"                = printUsage
-handleArg fileName            = doWork fileName
+handleArgs []                    = printUsage >> exitFailure
+handleArgs ["--numeric-version"] = putStrLn version
+handleArgs ["--version"]         = putStrLn $ "parser-helper v" ++ version
+handleArgs ["--help"]            = printUsage
+handleArgs ["-h"]                = printUsage
+handleArgs (fileName:args)       = doWork fileName args
 
 -- | Print usage info.
 printUsage :: IO ()
-printUsage = putStrLn "Usage: parser-helper [ file | --numeric-version | --version ]"
+printUsage = putStrLn "Usage: parser-helper [ file | --numeric-version | --version ] [-XExtension, ...]"
+
+getExtensions :: [String] -> [Extension]
+getExtensions = map (EnableExtension . read . drop 2) . filter ("-X" `isPrefixOf`)
 
 -- | Parse, serialize and print to stdout.
-doWork :: String -> IO ()
-doWork fileName = do
-    let parseOpts = defaultParseMode { parseFilename = "A.hs"
+doWork :: String -> [String] -> IO ()
+doWork fileName args = do
+    let extensions = getExtensions args
+        parseOpts = defaultParseMode { parseFilename = "A.hs"
                                      , baseLanguage = Haskell2010
-                                     , extensions = ghcDefault
+                                     , extensions = ghcDefault ++ extensions
                                      }
     p <- parseFileWithComments parseOpts fileName
     case p of
