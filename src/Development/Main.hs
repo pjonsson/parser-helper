@@ -11,6 +11,7 @@ import           Data.Text                       (pack)
 import           Language.Haskell.Exts.Annotated
 import           System.Environment
 import           System.Exit                     (exitFailure)
+import           Text.Read                       (readMaybe)
 
 -- | Program version. Important for API changes.
 version :: String
@@ -182,10 +183,12 @@ handleArgs (fileName:args)       = doWork fileName args
 
 -- | Print usage info.
 printUsage :: IO ()
-printUsage = putStrLn "Usage: parser-helper [ file | --numeric-version | --version ] [-XExtension, ...]"
+printUsage = putStrLn "Usage: parser-helper [ file | --numeric-version | --version ] [-XExtension ...]"
 
 getExtensions :: [String] -> [Extension]
-getExtensions = map (EnableExtension . read . drop 2) . filter ("-X" `isPrefixOf`)
+getExtensions = map parseExtension . filter ("-X" `isPrefixOf`)
+  where
+    parseExtension x = maybe (error $ "Invalid extension " ++ show x) EnableExtension . readMaybe . drop 2 $ x
 
 -- | Parse, serialize and print to stdout.
 doWork :: String -> [String] -> IO ()
