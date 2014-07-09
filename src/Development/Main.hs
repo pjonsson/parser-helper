@@ -98,77 +98,75 @@ $(deriveToJSON defaultOptions { sumEncoding = ObjectWithSingleField } ''Rule)
 -- l (ModuleName l) (Maybe (WarningText l)) (Maybe (ExportSpecList l))
 instance ToJSON l => ToJSON (ModuleHead l) where
     toJSON (ModuleHead s n wt es)
-        = object [(pack "ModuleHead") .= [toJSON s, toJSON n, toJSON wt, toJSON es]]
+        = object [pack "ModuleHead" .= [toJSON s, toJSON n, toJSON wt, toJSON es]]
 
 instance ToJSON l => ToJSON (ModuleName l) where
     toJSON (ModuleName s name)
-        = object [(pack "ModuleName") .= [toJSON s, toJSON name]]
+        = object [pack "ModuleName" .= [toJSON s, toJSON name]]
 
 -- data Comment = Comment Bool SrcSpan String
 instance ToJSON Comment where
     toJSON (Comment b s c)
-        = object [(pack "Comment") .= [toJSON b, toJSON s, toJSON c]]
+        = object [pack "Comment" .= [toJSON b, toJSON s, toJSON c]]
 
 instance ToJSON l => ToJSON (ImportSpecList l) where
     toJSON (ImportSpecList l b ls)
-        = object [(pack "ImportSpecList") .= [toJSON l, toJSON b, toJSON ls]]
+        = object [pack "ImportSpecList" .= [toJSON l, toJSON b, toJSON ls]]
 
 instance ToJSON l => ToJSON (ExportSpecList l) where
     toJSON (ExportSpecList l ls)
-        = object [(pack "ExportSpecList") .= [toJSON l, toJSON ls]]
+        = object [pack "ExportSpecList" .= [toJSON l, toJSON ls]]
 
 instance ToJSON l => ToJSON (Deriving l) where
-    toJSON (Deriving l hs) = object [(pack "Deriving") .= [toJSON l, toJSON hs]]
+    toJSON (Deriving l hs) = object [pack "Deriving" .= [toJSON l, toJSON hs]]
 
 instance ToJSON l => ToJSON (IfAlt l) where
     toJSON (IfAlt l e1 e2)
-        = object [(pack "IfAlt") .= [toJSON l, toJSON e1, toJSON e2]]
+        = object [pack "IfAlt" .= [toJSON l, toJSON e1, toJSON e2]]
 
 instance ToJSON l => ToJSON (GuardedAlt l) where
     toJSON (GuardedAlt l s1 e2)
-        = object [(pack "GuardedAlt") .= [toJSON l, toJSON s1, toJSON e2]]
+        = object [pack "GuardedAlt" .= [toJSON l, toJSON s1, toJSON e2]]
 
 instance ToJSON l => ToJSON (Alt l) where
     toJSON (Alt l p alts bs)
-        = object [(pack "Alt") .= [toJSON l, toJSON p, toJSON alts, toJSON bs]]
+        = object [pack "Alt" .= [toJSON l, toJSON p, toJSON alts, toJSON bs]]
 
 instance ToJSON l => ToJSON (PXAttr l) where
     toJSON (PXAttr l x p)
-        = object [(pack "PXAttr") .= [toJSON l, toJSON x, toJSON p]]
+        = object [pack "PXAttr" .= [toJSON l, toJSON x, toJSON p]]
 
 instance ToJSON l => ToJSON (XAttr l) where
     toJSON (XAttr l x e)
-        = object [(pack "XAttr") .= [toJSON l, toJSON x, toJSON e]]
+        = object [pack "XAttr" .= [toJSON l, toJSON x, toJSON e]]
 
 instance ToJSON l => ToJSON (FunDep l) where
     toJSON (FunDep l n1 n2)
-        = object [(pack "FunDep") .= [toJSON l, toJSON n1, toJSON n2]]
+        = object [pack "FunDep" .= [toJSON l, toJSON n1, toJSON n2]]
 
 instance ToJSON l => ToJSON (GadtDecl l) where
     toJSON (GadtDecl l n1 t2)
-        = object [(pack "GadtDecl") .= [toJSON l, toJSON n1, toJSON t2]]
+        = object [pack "GadtDecl" .= [toJSON l, toJSON n1, toJSON t2]]
 
 instance ToJSON l => ToJSON (FieldDecl l) where
     toJSON (FieldDecl l n1 b2)
-        = object [(pack "FieldDecl") .= [toJSON l, toJSON n1, toJSON b2]]
+        = object [pack "FieldDecl" .= [toJSON l, toJSON n1, toJSON b2]]
 
 instance ToJSON l => ToJSON (QualConDecl l) where
     toJSON (QualConDecl l tys c1 c2)
-        = object [(pack "QualConDecl") .= [toJSON l, toJSON tys, toJSON c1
-                                          , toJSON c2]]
+        = object [pack "QualConDecl" .= [toJSON l, toJSON tys, toJSON c1, toJSON c2]]
 
 instance ToJSON l => ToJSON (IPBind l) where
     toJSON (IPBind l ip n)
-        = object [(pack "IPBind") .= [toJSON l, toJSON ip, toJSON n]]
+        = object [pack "IPBind" .= [toJSON l, toJSON ip, toJSON n]]
 
 instance ToJSON l => ToJSON (GuardedRhs l) where
     toJSON (GuardedRhs l s e)
-        = object [(pack "GuardedRhs") .= [toJSON l, toJSON s, toJSON e]]
+        = object [pack "GuardedRhs" .= [toJSON l, toJSON s, toJSON e]]
 
 instance ToJSON l => ToJSON (Rule l) where
     toJSON (Rule l s a r e1 e2)
-        = object [(pack "Rule") .= [toJSON l, toJSON s, toJSON a, toJSON r
-                                   , toJSON e1, toJSON e2]]
+        = object [pack "Rule" .= [toJSON l, toJSON s, toJSON a, toJSON r, toJSON e1, toJSON e2]]
 
 -- | Parse the first argument and serialize as JSON to stdout.
 main :: IO ()
