@@ -2,6 +2,7 @@
 {-# LANGUAGE TemplateHaskell   #-}
 module Main (main) where
 
+import           Control.Applicative
 import           Data.Aeson
 import           Data.Aeson.TH
 import qualified Data.ByteString.Lazy            as B
@@ -183,7 +184,11 @@ handleArgs (fileName:args)       = doWork fileName args
 
 -- | Print usage info.
 printUsage :: IO ()
-printUsage = putStrLn "Usage: parser-helper [ file | --numeric-version | --version ] [-XExtension ...]"
+printUsage = putStrLn . unlines $
+    [ "Usage: parser-helper [ file | --numeric-version | --version ] [-XExtension ...]"
+    , ""
+    , "To parse from stdin, use - instead of file: parser-helper -"
+    ]
 
 getExtensions :: [String] -> [Extension]
 getExtensions = map parseExtension . filter ("-X" `isPrefixOf`)
@@ -198,7 +203,11 @@ doWork fileName args = do
                                      , baseLanguage = Haskell2010
                                      , extensions = ghcDefault ++ extensions
                                      }
-    p <- parseFileWithComments parseOpts fileName
+    p <- if fileName == "-" then
+            parseFileContentsWithComments parseOpts <$> getContents
+         else
+            parseFileWithComments parseOpts fileName
+
     case p of
         ParseOk tree -> B.putStrLn (encode tree)
         ParseFailed loc msg -> putStrLn $ "ERROR:" ++ msg
