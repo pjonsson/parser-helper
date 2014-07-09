@@ -208,4 +208,4 @@ doWork fileName args = do
 
     case p of
         ParseOk tree -> B.putStrLn (encode tree)
-        ParseFailed loc msg -> putStrLn $ "ERROR:" ++ msg
+        ParseFailed loc msg -> putStrLn ("ERROR:" ++ msg) >> exitFailure
