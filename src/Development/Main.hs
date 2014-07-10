@@ -9,20 +9,17 @@ import qualified Data.ByteString.Lazy            as B
 import           Data.List                       (isPrefixOf)
 import           Data.Maybe                      (listToMaybe)
 import           Data.Text                       (pack)
+import           Data.Version                    (showVersion)
 import           Language.Haskell.Exts.Annotated
+import           Paths_parser_helper             (version)
 import           System.Environment
 import           System.Exit                     (exitFailure)
 import           Text.Read                       (readMaybe)
 
--- | Program version. Important for API changes.
-version :: String
-version = "0.1.0.1"
-
 $(deriveToJSON defaultOptions { sumEncoding = ObjectWithSingleField } ''SrcSpanInfo)
 $(deriveToJSON defaultOptions { sumEncoding = ObjectWithSingleField } ''SrcSpan)
 $(deriveToJSON defaultOptions { sumEncoding = ObjectWithSingleField } ''Module)
--- We need to manually derive this instance since one of its constructors, Con, clashes with Windows.
--- $(deriveToJSON defaultOptions { sumEncoding = ObjectWithSingleField } ''Exp)
+$(deriveToJSON defaultOptions { sumEncoding = ObjectWithSingleField } ''Exp)
 $(deriveToJSON defaultOptions { sumEncoding = ObjectWithSingleField } ''Promoted)
 $(deriveToJSON defaultOptions { sumEncoding = ObjectWithSingleField } ''ImportDecl)
 $(deriveToJSON defaultOptions { sumEncoding = ObjectWithSingleField } ''ImportSpec)
@@ -169,64 +166,14 @@ instance ToJSON l => ToJSON (Rule l) where
     toJSON (Rule l s a r e1 e2)
         = object [pack "Rule" .= [toJSON l, toJSON s, toJSON a, toJSON r, toJSON e1, toJSON e2]]
 
-instance ToJSON l => ToJSON (Exp l) where
-    toJSON (Var a b) = object [pack "Var" .= [toJSON a, toJSON b]]
-    toJSON (IPVar a b) = object [pack "IPVar" .= [toJSON a, toJSON b]]
-    toJSON (Con a b) = object [pack "Con_" .= [toJSON a, toJSON b]]
-    toJSON (Lit a b) = object [pack "Lit" .= [toJSON a, toJSON b]]
-    toJSON (InfixApp a b c d) = object [pack "InfixApp" .= [toJSON a, toJSON b, toJSON c, toJSON d]]
-    toJSON (App a b c) = object [pack "App" .= [toJSON a, toJSON b, toJSON c]]
-    toJSON (NegApp a b) = object [pack "NegApp" .= [toJSON a, toJSON b]]
-    toJSON (Lambda a b c) = object [pack "Lambda" .= [toJSON a, toJSON b, toJSON c]]
-    toJSON (Let a b c) = object [pack "Let" .= [toJSON a, toJSON b, toJSON c]]
-    toJSON (If a b c d) = object [pack "If" .= [toJSON a, toJSON b, toJSON c, toJSON d]]
-    toJSON (MultiIf a b) = object [pack "MultiIf" .= [toJSON a, toJSON b]]
-    toJSON (Case a b c) = object [pack "Case" .= [toJSON a, toJSON b, toJSON c]]
-    toJSON (Do a b) = object [pack "Do" .= [toJSON a, toJSON b]]
-    toJSON (MDo a b) = object [pack "MDo" .= [toJSON a, toJSON b]]
-    toJSON (Tuple a b c) = object [pack "Tuple" .= [toJSON a, toJSON b, toJSON c]]
-    toJSON (TupleSection a b c) = object [pack "TupleSection" .= [toJSON a, toJSON b, toJSON c]]
-    toJSON (List a b) = object [pack "List" .= [toJSON a, toJSON b]]
-    toJSON (Paren a b) = object [pack "Paren" .= [toJSON a, toJSON b]]
-    toJSON (LeftSection a b c) = object [pack "LeftSection" .= [toJSON a, toJSON b, toJSON c]]
-    toJSON (RightSection a b c) = object [pack "RightSection" .= [toJSON a, toJSON b, toJSON c]]
-    toJSON (RecConstr a b c) = object [pack "RecConstr" .= [toJSON a, toJSON b, toJSON c]]
-    toJSON (RecUpdate a b c) = object [pack "RecUpdate" .= [toJSON a, toJSON b, toJSON c]]
-    toJSON (EnumFrom a b) = object [pack "EnumFrom" .= [toJSON a, toJSON b]]
-    toJSON (EnumFromTo a b c) = object [pack "EnumFromTo" .= [toJSON a, toJSON b, toJSON c]]
-    toJSON (EnumFromThen a b c) = object [pack "EnumFromThen" .= [toJSON a, toJSON b, toJSON c]]
-    toJSON (EnumFromThenTo a b c d) = object [pack "EnumFromThenTo" .= [toJSON a, toJSON b, toJSON c, toJSON d]]
-    toJSON (ListComp a b c) = object [pack "ListComp" .= [toJSON a, toJSON b, toJSON c]]
-    toJSON (ParComp a b c) = object [pack "ParComp" .= [toJSON a, toJSON b, toJSON c]]
-    toJSON (ExpTypeSig a b c) = object [pack "ExpTypeSig" .= [toJSON a, toJSON b, toJSON c]]
-    toJSON (VarQuote a b) = object [pack "VarQuote" .= [toJSON a, toJSON b]]
-    toJSON (TypQuote a b) = object [pack "TypQuote" .= [toJSON a, toJSON b]]
-    toJSON (BracketExp a b) = object [pack "BracketExp" .= [toJSON a, toJSON b]]
-    toJSON (SpliceExp a b) = object [pack "SpliceExp" .= [toJSON a, toJSON b]]
-    toJSON (QuasiQuote a b c) = object [pack "QuasiQuote" .= [toJSON a, toJSON b, toJSON c]]
-    toJSON (XTag a b c d e) = object [pack "XTag" .= [toJSON a, toJSON b, toJSON c, toJSON d, toJSON e]]
-    toJSON (XETag a b c d) = object [pack "XETag" .= [toJSON a, toJSON b, toJSON c, toJSON d]]
-    toJSON (XPcdata a b) = object [pack "XPcdata" .= [toJSON a, toJSON b]]
-    toJSON (XExpTag a b) = object [pack "XExpTag" .= [toJSON a, toJSON b]]
-    toJSON (XChildTag a b) = object [pack "XChildTag" .= [toJSON a, toJSON b]]
-    toJSON (CorePragma a b c) = object [pack "CorePragma" .= [toJSON a, toJSON b, toJSON c]]
-    toJSON (SCCPragma a b c) = object [pack "SCCPragma" .= [toJSON a, toJSON b, toJSON c]]
-    toJSON (GenPragma a b c d e) = object [pack "GenPragma" .= [toJSON a, toJSON b, toJSON c, toJSON d, toJSON e]]
-    toJSON (Proc a b c) = object [pack "Proc" .= [toJSON a, toJSON b, toJSON c]]
-    toJSON (LeftArrApp a b c) = object [pack "LeftArrApp" .= [toJSON a, toJSON b, toJSON c]]
-    toJSON (RightArrApp a b c) = object [pack "RightArrApp" .= [toJSON a, toJSON b, toJSON c]]
-    toJSON (LeftArrHighApp a b c) = object [pack "LeftArrHighApp" .= [toJSON a, toJSON b, toJSON c]]
-    toJSON (RightArrHighApp a b c) = object [pack "RightArrHighApp" .= [toJSON a, toJSON b, toJSON c]]
-    toJSON (LCase a b) = object [pack "LCase" .= [toJSON a, toJSON b]]
-
 -- | Parse the first argument and serialize as JSON to stdout.
 main :: IO ()
 main = getArgs >>= handleArgs
 
 -- | Handle possible arguments.
 handleArgs []                    = printUsage >> exitFailure
-handleArgs ["--numeric-version"] = putStrLn version
-handleArgs ["--version"]         = putStrLn $ "parser-helper v" ++ version
+handleArgs ["--numeric-version"] = putStrLn . showVersion $ version
+handleArgs ["--version"]         = putStrLn $ "parser-helper v" ++ showVersion version
 handleArgs ["--help"]            = printUsage
 handleArgs ["-h"]                = printUsage
 handleArgs (fileName:args)       = doWork fileName args
@@ -234,7 +181,7 @@ handleArgs (fileName:args)       = doWork fileName args
 -- | Print usage info.
 printUsage :: IO ()
 printUsage = putStrLn . unlines $
-    [ "Usage: parser-helper [ file | --numeric-version | --version ] [-XExtension ...]"
+    [ "Usage: parser-helper [ file [-XExtension ...] | --numeric-version | --version ]"
     , ""
     , "To parse from stdin, use - instead of file: parser-helper -"
     ]
