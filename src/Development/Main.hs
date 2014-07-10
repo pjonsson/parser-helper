@@ -21,7 +21,8 @@ version = "0.1.0.1"
 $(deriveToJSON defaultOptions { sumEncoding = ObjectWithSingleField } ''SrcSpanInfo)
 $(deriveToJSON defaultOptions { sumEncoding = ObjectWithSingleField } ''SrcSpan)
 $(deriveToJSON defaultOptions { sumEncoding = ObjectWithSingleField } ''Module)
-$(deriveToJSON defaultOptions { sumEncoding = ObjectWithSingleField } ''Exp)
+-- We need to manually derive this instance since one of its constructors, Con, clashes with Windows.
+-- $(deriveToJSON defaultOptions { sumEncoding = ObjectWithSingleField } ''Exp)
 $(deriveToJSON defaultOptions { sumEncoding = ObjectWithSingleField } ''Promoted)
 $(deriveToJSON defaultOptions { sumEncoding = ObjectWithSingleField } ''ImportDecl)
 $(deriveToJSON defaultOptions { sumEncoding = ObjectWithSingleField } ''ImportSpec)
@@ -167,6 +168,51 @@ instance ToJSON l => ToJSON (GuardedRhs l) where
 instance ToJSON l => ToJSON (Rule l) where
     toJSON (Rule l s a r e1 e2)
         = object [pack "Rule" .= [toJSON l, toJSON s, toJSON a, toJSON r, toJSON e1, toJSON e2]]
+
+instance ToJSON l => ToJSON (Exp l) where
+    toJSON (Var a b) = object [pack "Var" .= [toJSON a, toJSON b]]
+    toJSON (IPVar a b) = object [pack "IPVar" .= [toJSON a, toJSON b]]
+    toJSON (Con a b) = object [pack "Con_" .= [toJSON a, toJSON b]]
+    toJSON (Lit a b) = object [pack "Lit" .= [toJSON a, toJSON b]]
+    toJSON (InfixApp a b c d) = object [pack "InfixApp" .= [toJSON a, toJSON b, toJSON c, toJSON d]]
+    toJSON (App a b c) = object [pack "App" .= [toJSON a, toJSON b, toJSON c]]
+    toJSON (NegApp a b) = object [pack "NegApp" .= [toJSON a, toJSON b]]
+    toJSON (Lambda a b c) = object [pack "Lambda" .= [toJSON a, toJSON b, toJSON c]]
+    toJSON (Let a b c) = object [pack "Let" .= [toJSON a, toJSON b, toJSON c]]
+    toJSON (If a b c d) = object [pack "If" .= [toJSON a, toJSON b, toJSON c, toJSON d]]
+    toJSON (MultiIf a b) = object [pack "MultiIf" .= [toJSON a, toJSON b]]
+    toJSON (Case a b c) = object [pack "Case" .= [toJSON a, toJSON b, toJSON c]]
+    toJSON (Do a b) = object [pack "Do" .= [toJSON a, toJSON b]]
+    toJSON (MDo a b) = object [pack "MDo" .= [toJSON a, toJSON b]]
+    toJSON (Tuple a b c) = object [pack "Tuple" .= [toJSON a, toJSON b, toJSON c]]
+    toJSON (TupleSection a b c) = object [pack "TupleSection" .= [toJSON a, toJSON b, toJSON c]]
+    toJSON (List a b) = object [pack "List" .= [toJSON a, toJSON b]]
+    toJSON (Paren a b) = object [pack "Paren" .= [toJSON a, toJSON b]]
+    toJSON (LeftSection a b c) = object [pack "LeftSection" .= [toJSON a, toJSON b, toJSON c]]
+    toJSON (RightSection a b c) = object [pack "RightSection" .= [toJSON a, toJSON b, toJSON c]]
+    toJSON (RecConstr a b c) = object [pack "RecConstr" .= [toJSON a, toJSON b, toJSON c]]
+    toJSON (RecUpdate a b c) = object [pack "RecUpdate" .= [toJSON a, toJSON b, toJSON c]]
+    toJSON (EnumFrom a b) = object [pack "EnumFrom" .= [toJSON a, toJSON b]]
+    toJSON (EnumFromTo a b c) = object [pack "EnumFromTo" .= [toJSON a, toJSON b, toJSON c]]
+    toJSON (EnumFromThen a b c) = object [pack "EnumFromThen" .= [toJSON a, toJSON b, toJSON c]]
+    toJSON (EnumFromThenTo a b c d) = object [pack "EnumFromThenTo" .= [toJSON a, toJSON b, toJSON c, toJSON d]]
+    toJSON (ListComp a b c) = object [pack "ListComp" .= [toJSON a, toJSON b, toJSON c]]
+    toJSON (ParComp a b c) = object [pack "ParComp" .= [toJSON a, toJSON b, toJSON c]]
+    toJSON (ExpTypeSig a b c) = object [pack "ExpTypeSig" .= [toJSON a, toJSON b, toJSON c]]
+    toJSON (VarQuote a b) = object [pack "VarQuote" .= [toJSON a, toJSON b]]
+    toJSON (TypQuote a b) = object [pack "TypQuote" .= [toJSON a, toJSON b]]
+    toJSON (BracketExp a b) = object [pack "BracketExp" .= [toJSON a, toJSON b]]
+    toJSON (SpliceExp a b) = object [pack "SpliceExp" .= [toJSON a, toJSON b]]
+    toJSON (QuasiQuote a b c) = object [pack "QuasiQuote" .= [toJSON a, toJSON b, toJSON c]]
+    toJSON (XTag a b c d e) = object [pack "XTag" .= [toJSON a, toJSON b, toJSON c, toJSON d, toJSON e]]
+    toJSON (XETag a b c d) = object [pack "XETag" .= [toJSON a, toJSON b, toJSON c, toJSON d]]
+    toJSON (XPcdata a b) = object [pack "XPcdata" .= [toJSON a, toJSON b]]
+    toJSON (XExpTag a b) = object [pack "XExpTag" .= [toJSON a, toJSON b]]
+    toJSON (XChildTag a b) = object [pack "XChildTag" .= [toJSON a, toJSON b]]
+    toJSON (CorePragma a b c) = object [pack "CorePragma" .= [toJSON a, toJSON b, toJSON c]]
+    toJSON (SCCPragma a b c) = object [pack "SCCPragma" .= [toJSON a, toJSON b, toJSON c]]
+    toJSON (GenPragma a b c d e) = object [pack "GenPragma" .= [toJSON a, toJSON b, toJSON c, toJSON d, toJSON e]]
+    toJSON (Proc a b c) = object [pack "Proc" .= [toJSON a, toJSON b, toJSON c]]
 
 -- | Parse the first argument and serialize as JSON to stdout.
 main :: IO ()
