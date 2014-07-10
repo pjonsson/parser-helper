@@ -213,6 +213,11 @@ instance ToJSON l => ToJSON (Exp l) where
     toJSON (SCCPragma a b c) = object [pack "SCCPragma" .= [toJSON a, toJSON b, toJSON c]]
     toJSON (GenPragma a b c d e) = object [pack "GenPragma" .= [toJSON a, toJSON b, toJSON c, toJSON d, toJSON e]]
     toJSON (Proc a b c) = object [pack "Proc" .= [toJSON a, toJSON b, toJSON c]]
+    toJSON (LeftArrApp a b c) = object [pack "LeftArrApp" .= [toJSON a, toJSON b, toJSON c]]
+    toJSON (RightArrApp a b c) = object [pack "RightArrApp" .= [toJSON a, toJSON b, toJSON c]]
+    toJSON (LeftArrHighApp a b c) = object [pack "LeftArrHighApp" .= [toJSON a, toJSON b, toJSON c]]
+    toJSON (RightArrHighApp a b c) = object [pack "RightArrHighApp" .= [toJSON a, toJSON b, toJSON c]]
+    toJSON (LCase a b) = object [pack "LCase" .= [toJSON a, toJSON b]]
 
 -- | Parse the first argument and serialize as JSON to stdout.
 main :: IO ()
