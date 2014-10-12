@@ -30,7 +30,7 @@ executable parser-helper
   -- other-modules:
   other-extensions:    TemplateHaskell,
                        OverloadedStrings
-  build-depends:       base >= 4.6 && <4.7,
+  build-depends:       base >= 4.6,
                        aeson > 0.7,
                        haskell-src-exts > 1.15 && < 1.16,
                        bytestring > 0.10,
