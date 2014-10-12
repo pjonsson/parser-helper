@@ -5,7 +5,7 @@ module Main (main) where
 import           Control.Applicative
 import           Data.Aeson
 import           Data.Aeson.TH
-import qualified Data.ByteString.Lazy            as B
+import qualified Data.ByteString.Lazy.Char8      as B
 import           Data.List                       (isPrefixOf)
 import           Data.Maybe                      (listToMaybe)
 import           Data.Text                       (pack)
